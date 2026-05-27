@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CraftMeet</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif;}
+
+    body{
+      background:#0f172a;
+      color:white;
+    }
+
+    header{
+      padding:15px 10%;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      background:#111827;
+      position:sticky;
+      top:0;
+    }
+
+    .logo{color:#22c55e;font-size:24px;font-weight:700;}
+
+    nav button{
+      margin-left:10px;
+      padding:8px 15px;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      background:#22c55e;
+      color:#000;
+      font-weight:600;
+    }
+
+    section{padding:30px 10%;}
+
+    .hidden{display:none;}
+
+    input, textarea{
+      width:100%;
+      padding:10px;
+      margin:10px 0;
+      border-radius:8px;
+      border:none;
+    }
+
+    .card{
+      background:#1e293b;
+      padding:20px;
+      border-radius:10px;
+      margin-top:10px;
+    }
+
+    .btn{
+      padding:10px 15px;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      background:#22c55e;
+      font-weight:600;
+    }
+
+    .chat-box{
+      height:200px;
+      overflow-y:auto;
+      background:#0b1220;
+      padding:10px;
+      border-radius:10px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">CraftMeet</div>
+  <nav>
+    <button onclick="showPage('login')">Login</button>
+    <button onclick="showPage('profile')">Profile</button>
+    <button onclick="showPage('chat')">Chat</button>
+  </nav>
+</header>
+
+<!-- LOGIN -->
+<section id="login">
+  <h2>Login / Register</h2>
+  <input id="username" placeholder="Enter username" />
+  <input id="password" type="password" placeholder="Enter password" />
+  <button class="btn" onclick="loginUser()">Login</button>
+  <button class="btn" onclick="registerUser()">Register</button>
+  <p id="msg"></p>
+</section>
+
+<!-- PROFILE -->
+<section id="profile" class="hidden">
+  <h2>Player Profile</h2>
+  <div class="card">
+    <p id="profileName">Not logged in</p>
+    <p>Minecraft Rank: Rookie</p>
+    <p>Country: Global</p>
+  </div>
+</section>
+
+<!-- CHAT -->
+<section id="chat" class="hidden">
+  <h2>Global Chat</h2>
+  <div class="chat-box" id="chatBox"></div>
+  <input id="chatInput" placeholder="Type message..." />
+  <button class="btn" onclick="sendMsg()">Send</button>
+</section>
+
+<script>
+let currentUser = localStorage.getItem("user");
+
+function showPage(page){
+  document.querySelectorAll("section").forEach(s => s.classList.add("hidden"));
+  document.getElementById(page).classList.remove("hidden");
+  updateProfile();
+  loadChat();
+}
+
+function registerUser(){
+  let u = username.value;
+  let p = password.value;
+  localStorage.setItem(u, p);
+  msg.innerText = "Registered! Now login 😎";
+}
+
+function loginUser(){
+  let u = username.value;
+  let p = password.value;
+
+  if(localStorage.getItem(u) === p){
+    currentUser = u;
+    localStorage.setItem("user", u);
+    msg.innerText = "Login success 🔥";
+    showPage('profile');
+  }else{
+    msg.innerText = "Wrong details ❌";
+  }
+}
+
+function updateProfile(){
+  profileName.innerText = "Player: " + (currentUser || "Guest");
+}
+
+function sendMsg(){
+  let text = chatInput.value;
+  if(!text) return;
+
+  let chats = JSON.parse(localStorage.getItem("chat") || "[]");
+  chats.push(currentUser + ": " + text);
+  localStorage.setItem("chat", JSON.stringify(chats));
+
+  chatInput.value = "";
+  loadChat();
+}
+
+function loadChat(){
+  let chats = JSON.parse(localStorage.getItem("chat") || "[]");
+  chatBox.innerHTML = chats.map(c => `<p>${c}</p>`).join("");
+}
+
+showPage('login');
+</script>
+
+</body>
+</html>
